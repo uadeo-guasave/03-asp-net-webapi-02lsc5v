@@ -30,7 +30,7 @@ namespace myapi.DbContexts
       base.OnModelCreating(modelBuilder);
     }
 
-    public DbSet<User> Users;
+    public DbSet<User> Users { get; set; }
 
   }
 }
