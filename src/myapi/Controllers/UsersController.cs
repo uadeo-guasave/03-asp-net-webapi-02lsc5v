@@ -23,7 +23,7 @@ namespace myapi.Controllers
     public async Task<ActionResult<IEnumerable<User>>> Get()
     {
       // select * from users limit 10;
-      var users = await _db.Users.Take(20).ToArrayAsync();
+      var users = await _db.Users.Where(u => u.Id > 1000).ToArrayAsync();
       if (users.Length == 0)
       {
         return NotFound();
@@ -46,6 +46,7 @@ namespace myapi.Controllers
     }
 
     [HttpPost]
+    [Route("validate")]
     public async Task<ActionResult<string>> NameExists([FromForm] string username)
     {
       var user = await _db.Users.AnyAsync(u => u.Name == username);
@@ -57,9 +58,25 @@ namespace myapi.Controllers
       return $"{username} is available.";
     }
     // TODO: Programar los métodos para 
-    //       crear un nuevo usuario
     //       editar un usuario
     //       eliminar un usuario
     // CRUD: Create, Read, Update & Delete
+
+    [HttpPost]
+    [Route("create")]
+    public async Task<ActionResult<User>> Create([FromBody] User newUser)
+    {
+      var test = await _db.Users.AnyAsync(u => 
+        u.Name == newUser.Name || u.Email == newUser.Email);
+      if (test)
+      {
+        return BadRequest();
+      }
+
+      _db.Users.Add(newUser);
+      await _db.SaveChangesAsync();
+
+      return CreatedAtAction(nameof(GetById), new { id = newUser.Id }, newUser);
+    }
   }
 }
