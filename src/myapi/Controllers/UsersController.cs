@@ -19,6 +19,11 @@ namespace myapi.Controllers
       _db = db;
     }
 
+    private bool Exists(int id)
+    {
+      return _db.Users.Any(u => u.Id == id);
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> Get()
     {
@@ -57,9 +62,6 @@ namespace myapi.Controllers
 
       return $"{username} is available.";
     }
-    // TODO: Programar los métodos para 
-    //       editar un usuario
-    //       eliminar un usuario
     // CRUD: Create, Read, Update & Delete
 
     [HttpPost]
@@ -77,6 +79,50 @@ namespace myapi.Controllers
       await _db.SaveChangesAsync();
 
       return CreatedAtAction(nameof(GetById), new { id = newUser.Id }, newUser);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> SaveChanges(int id, [FromBody] User modifiedUser)
+    {
+      if (id != modifiedUser.Id)
+      {
+        return BadRequest();
+      }
+
+      _db.Entry(modifiedUser).State = EntityState.Modified;
+
+      try
+      {
+        await _db.SaveChangesAsync();
+      }
+      catch (DbUpdateConcurrencyException)
+      {
+        if (!Exists(id))
+        {
+          return NotFound();
+        }
+        else
+        {
+          throw;
+        }
+      }
+
+      return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<User>> Delete(int id)
+    {
+      var user = await _db.Users.FindAsync(id);
+      if (user == null)
+      {
+        return NotFound();
+      }
+
+      _db.Users.Remove(user);
+      await _db.SaveChangesAsync();
+
+      return user;
     }
   }
 }
