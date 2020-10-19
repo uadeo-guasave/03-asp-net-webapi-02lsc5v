@@ -39,7 +39,7 @@ namespace myapi.Controllers
 
     // https://localhost:5001/api/users/10
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetById(int id)
+    public async Task<ActionResult<User>> GetById([FromRoute] int id/*, [FromQuery] string nombre*/)
     {
       var user = await _db.Users.FindAsync(id);
       if (user == null)
@@ -68,6 +68,8 @@ namespace myapi.Controllers
     [Route("create")]
     public async Task<ActionResult<User>> Create([FromBody] User newUser)
     {
+      TryValidateModel(newUser);
+      
       var test = await _db.Users.AnyAsync(u => 
         u.Name == newUser.Name || u.Email == newUser.Email);
       if (test)
