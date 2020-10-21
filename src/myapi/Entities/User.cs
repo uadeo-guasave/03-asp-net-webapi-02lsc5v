@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using myapi.Helpers;
 
 namespace myapi.Entities
 {
@@ -27,8 +28,7 @@ namespace myapi.Entities
     [StringLength(50, MinimumLength = 1)]
     public string Lastname { get; set; }
 
-    // TODO: crear atributo personalizado para validar que sea MALE ó FEMALE solamente
-    [Required, MaxLength(6)/*, Gender*/]
+    [Required, MaxLength(6), Gender]
     public string Gender { get; set; }
   }
 
