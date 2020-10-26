@@ -17,8 +17,7 @@ namespace myapi.Entities
 
     [Required, MaxLength(200)]
     [StringLength(16, MinimumLength = 8, ErrorMessage = "La contraseña debe tener de 8 a 16 caracteres.")]
-    // TODO: crear un atributo que valide cuando la contraseña tenga espacios y 
-    // mencione el error, que no debe llevar espacios.
+    [WithoutSpace]
     public string Password { get; set; }
 
     [Required, MaxLength(200), EmailAddress]
@@ -41,6 +40,7 @@ namespace myapi.Entities
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
       // agregar la logica de las validaciones
+      // Au3-67 623
       var strengh = PasswordStrengh();
       if (strengh < 3)
       {
